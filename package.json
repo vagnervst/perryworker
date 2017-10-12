@@ -4,7 +4,7 @@
   "description": "Worker for Support's Github Monitoring Dashboard",
   "main": "index.js",
   "scripts": {
-    "build": "babel ./ --out-dir build/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
+    "build": "babel ./ --out-dir build/ --ignore ./build,./node_modules,./.babelrc,./package.json,./npm-debug.log",
     "start": "npm run build && node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,7 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "chalk": "^2.1.0",
-    "mongoose": "^4.12.1"
+    "convict": "^4.0.1",
+    "dotenv": "^4.0.0",
+    "mongoose": "^4.12.1",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
