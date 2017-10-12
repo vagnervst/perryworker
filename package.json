@@ -1,0 +1,21 @@
+{
+  "name": "perryworker",
+  "version": "1.0.0",
+  "description": "Worker for Support's Github Monitoring Dashboard",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel ./ --out-dir build/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
+    "start": "npm run build && node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vagner S",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.1.0",
+    "mongoose": "^4.12.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
+  }
+}
