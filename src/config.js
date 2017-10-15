@@ -5,6 +5,7 @@ const config = convict({
     doc: "Github V4 API",
     url: "https://api.github.com/graphql",
     token: {
+      default: 'Github',
       doc: 'The github API token.',
       format: String,
       env: 'GITHUB_API_TOKEN',
