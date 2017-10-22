@@ -1,8 +1,8 @@
-import organization from './organization.js';
-import repository from './repository.js';
-import pullrequest from './pullrequest.js';
-import user from './user.js';
-import issue from './issue.js';
+import organization from './organization';
+import repository from './repository';
+import pullrequest from './pullrequest';
+import user from './user';
+import issue from './issue';
 
 export default {
   organization,
