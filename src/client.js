@@ -1,98 +1,57 @@
 import chalk from 'chalk';
+import Promise from 'bluebird';
 
 import requests from './requests';
-import Worker from './worker.js';
+import Worker from './worker';
 import controllers from './mongo/controllers';
-import Mongo from './mongo/connection.js';
+import Mongo from './mongo/connection';
 import Helpers from './mongo/helper';
+import Generators from './generators';
+import asciiPerry from '../ascii';
 
+console.log(asciiPerry);
+console.log(chalk.green('PerryWorker started running...'));
 Worker([
   {
     promise: requests.repositories.find({ organization: 'pagarme' }),
     registrator: (response) => {
 
       let organization = response.data.organization;
-      controllers.organization.save({ name: organization.name, login: organization.login })
+
+      return Generators.organization(organization)
       .then( mongoOrganization => {
 
-        organization.repositories.nodes.forEach( repository => {
+        let repositoriesGenerators = organization.repositories.nodes.map( repository => {
 
-          let primaryLanguage = repository.primaryLanguage ? repository.primaryLanguage.name : '';
+          let coroutine = Promise.coroutine( function* ( organization, repositorySpec ) {
 
-          controllers.repository.save({
-            name: repository.name,
-            organizationId: mongoOrganization._id,
-            primaryLanguage,
-            url: repository.url
-          }).then( mongoRepository => {
+            let mongoRepository = yield Generators.repository( organization, repositorySpec );
 
-            let helpersPromises = [];
+            let issuesGenerators = repositorySpec.issues.nodes.map( issue => {
 
-            repository.issues.nodes.forEach( issue => {
+              let issueCoroutine = Promise.coroutine(function* (repository, issueSpec) {
 
-              let assigneesPromises = [];
-              issue.assignees.nodes.forEach( assignee => {
+                let mongoIssue = yield Generators.issue( repository, issueSpec );
 
-                assigneesPromises.push(controllers.user.save({
-                  login: assignee.login,
-                  avatarUrl: assignee.avatarUrl,
-                  url: assignee.url
-                }));
-
+                return mongoIssue;
               });
 
-              const promisifiedIssue = {
-                title: issue.title,
-                state: issue.state,
-                url: issue.url,
-                createdAt: issue.createdAt,
-                repositoryId: mongoRepository._id,
-                authorId: controllers.user.save({
-                  login: issue.author.login,
-                  avatarUrl: issue.author.avatarUrl,
-                  url: issue.author.url
-                }),
-                assignees: assigneesPromises
-              };
-
-              let helperPromise = Helpers().resolve({ obj: promisifiedIssue, controller: controllers.issue });
-              helpersPromises.push( helperPromise );
+              return issueCoroutine(mongoRepository, issue);
 
             });
 
-            repository.pullRequests.nodes.forEach( pullRequest => {
-
-              const promisifiedPullRequest = {
-                title: pullRequest.title,
-                repositoryId: mongoRepository._id,
-                createdAt: pullRequest.createdAt,
-                url: pullRequest.url,
-                bodyText: pullRequest.bodyText,
-                author: controllers.user.save({
-                  login: pullRequest.author.login,
-                  avatarUrl: pullRequest.author.avatarUrl,
-                  url: pullRequest.author.url
-                }),
-                commitsCount: pullRequest.commits.totalCount
-              };
-
-              let helperPromise = Helpers().resolve({ obj: promisifiedPullRequest, controller: controllers.pullrequest })
-              helpersPromises.push( helperPromise );
-
-            });
-
-            Promise.all(helpersPromises)
-            .then( values => {
-              console.log('Finished working');
-              Mongo.connection.close();
-            });
-
+            return mongoRepository;
           });
 
+          return coroutine(mongoOrganization, repository);
 
         });
+
+        return Promise.all(repositoriesGenerators);
 
       });
     }
   }
-]).run();
+]).run().then( (values) => {
+  Mongo.connection.close();
+});
