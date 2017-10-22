@@ -64,5 +64,50 @@ export default {
         }
       }
     }`
+  },
+  issues: {
+    related: `query pagarmeqlRelatedIssuesQuery($term: String!){
+      search(query: $term, type: ISSUE, first: 50) {
+        nodes {
+          ... on Issue {
+            __typename
+            title
+            state
+            createdAt
+            url
+            author {
+              login
+              avatarUrl
+              url
+            }
+            assignees(first: 3) {
+              nodes {
+                avatarUrl
+                login
+                url
+              }
+            }
+            comments(last: 1) {
+              totalCount
+              nodes {
+                bodyText
+                author {
+                  login
+                  url
+                }
+              }
+            }
+            repository {
+              name
+              url
+              isPrivate
+              owner {
+                login
+              }
+            }
+          }
+        }
+      }
+    }`
   }
 }
