@@ -1,14 +1,12 @@
-function Helpers() {
+const Helpers = {
 
-  function isPromise(obj) {
+  isPromise: function(obj) {
     return ( obj && obj.then !== undefined );
-  }
-
-  function isArray(obj) {
+  },
+  isArray: function(obj) {
     return ( obj && obj.constructor === Array );
-  }
-
-  function findPromises(obj) {
+  },
+  findPromises: function(obj) {
 
     let foundPromises = [];
     if( isArray(obj) ) {
@@ -26,45 +24,35 @@ function Helpers() {
     }
 
     return foundPromises;
-  }
+  },
+  /**
+    @param {Object} spec
+    @param {Object} spec.object
+    @param {Object} spec.buildControllerPayload
+    @param {Promise} controller
+  */
+  prepareControllerPromise: function( spec, controller ) {
+    let { object, buildControllerPayload } = spec;
 
-  return {
-    /**
-      @param {Object} spec
-      @param {Object} spec.obj
-      @param {Object} spec.controller
-    */
-    resolve: function( spec, callback ) {
+    let controllerSpec = buildControllerPayload(object);
 
-      let propertiesWithPromises = [];
-      for( let property in spec.obj ) {
-        let foundPromises = findPromises(spec.obj[property]);
-        if( foundPromises.length > 0 ) {
-          propertiesWithPromises.push({ promises: Promise.all( findPromises(spec.obj[property]) ), property });
-        }
-      }
+    return controller.save(controllerSpec);
+  },
+  /**
+    @param {Object} spec
+    @param {Object} spec.objects
+    @param {Object} spec.buildControllerPayload
+    @param {Promise} controller
+  */
+  prepareControllerPromises: function( spec, controller ) {
+    const { buildControllerPayload } = spec;
 
-      let promises = propertiesWithPromises.map( item => item.promises );
-
-      return Promise.all(promises)
-      .then( mongoItems => {
-
-        for(let i = 0; i < propertiesWithPromises.length; i += 1) {
-          spec.obj[propertiesWithPromises[i].property] = mongoItems[i].map( item => item._id );
-        }
-
-        spec.controller.save(spec.obj)
-        .then( mongoItem => {
-
-          if( callback ) {
-            callback(mongoItem);
-          }
-
-        })
-        .catch( err => console.log(err));
-      });
-      
-    }
+    return spec.objects.map( object => {
+      return this.prepareControllerPromise({
+        object,
+        buildControllerPayload
+      }, controller);
+    });
   }
 }
 
