@@ -1,41 +1,21 @@
 import chalk from 'chalk';
+import Promise from 'bluebird';
 
 function ControllerCore(Model) {
 
   return {
-    save: (spec, callback) => {
-      return new Promise( (resolve, reject) => {
-          let newDocument = new Model(spec);
-          newDocument.save( (error, document) => {
-            if( error ) {
+    save: (spec) => {
+      return Model.findOne(spec)
+      .then( foundDocument => {
 
-              const DUPLICATE_KEY = 11000;
-              if( error.code === DUPLICATE_KEY ) {
+        if( foundDocument ) {
+          return foundDocument;
+        }
 
-                Model.findOne(spec)
-                .then( existentDocument => {
-                  resolve(existentDocument);
-                });
-
-              } else {
-                console.log( chalk.red('Mongo operation failed:') + ' ' + error );
-              }
-
-            } else {
-              resolve( document );
-            }
-          });
-      });
-    },
-    find: function(spec, callback) {
-      return new Promise( (resolve, reject) => {
-        Model.find(spec)
-        .then( foundDocument => {
-          resolve(foundDocument);
-        })
-        .catch( err => {
-          console.log(chalk.red('Mongo operation failed:') + ' ' + err)
-        });
+        let newDocument = new Model(spec);
+        return newDocument.save()
+        .then( result => result )
+        .catch( err => console.log(chalk.red('Mongo Operation: ') + err));
       });
     }
   }
