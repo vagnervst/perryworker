@@ -18,38 +18,7 @@ Worker([
 
       let organization = response.data.organization;
 
-      return Generators.organization(organization)
-      .then( mongoOrganization => {
-
-        let repositoriesGenerators = organization.repositories.nodes.map( repository => {
-
-          let coroutine = Promise.coroutine( function* ( organization, repositorySpec ) {
-
-            let mongoRepository = yield Generators.repository( organization, repositorySpec );
-
-            let issuesGenerators = repositorySpec.issues.nodes.map( issue => {
-
-              let issueCoroutine = Promise.coroutine(function* (repository, issueSpec) {
-
-                let mongoIssue = yield Generators.issue( repository, issueSpec );
-
-                return mongoIssue;
-              });
-
-              return issueCoroutine(mongoRepository, issue);
-
-            });
-
-            return mongoRepository;
-          });
-
-          return coroutine(mongoOrganization, repository);
-
-        });
-
-        return Promise.all(repositoriesGenerators);
-
-      });
+      return Generators.saveOrganization(organization);
     }
   }
 ]).run().then( (values) => {
