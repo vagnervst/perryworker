@@ -1,5 +1,7 @@
 import repositories from './repositories.js';
+import issues from './issues.js';
 
 export default {
-  repositories: repositories()
+  repositories: repositories(),
+  issues: issues()
 }
