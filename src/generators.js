@@ -57,10 +57,9 @@ const Generators = {
     @param {Object} githubIssue - Issue received from Github API
   */
   saveIssue: Promise.coroutine(function* (repository, githubIssue) {
-    const { title, state, url, createdAt } = githubIssue;
+    const { title, state, url, createdAt, comments } = githubIssue;
 
     let author = yield this.saveUser(githubIssue.author);
-
     let assignees = yield this.saveUsers(githubIssue.assignees.nodes);
 
     const issuePayload = {
@@ -74,10 +73,14 @@ const Generators = {
           return assignee._id;
         }
       }),
-      repositoryId: repository._id
+      repositoryId: repository._id,
+      commentsCount: comments.totalCount
     };
 
     let issue = yield controllers.issue.save(issuePayload);
+
+    let commentsDocuments = yield this.saveComments({ model: 'issue', id: issue._id }, comments.nodes);
+
     return issue;
   }),
   /**
@@ -114,6 +117,9 @@ const Generators = {
     };
 
     let pullRequest = yield controllers.pullrequest.save(pullRequestPayload);
+
+    let commentsDocuments = yield this.saveComments({ name: 'pullrequest', id: pullRequest._id }, comments.nodes );
+
     return pullRequest;
   }),
   /**
@@ -128,6 +134,28 @@ const Generators = {
     let pullRequests = yield Promise.all(pullRequestsPromises);
 
     return pullRequests;
+  }),
+  saveComment: Promise.coroutine(function* (model, githubComment) {
+    const { bodyText } = githubComment;
+    let author = yield this.saveUser(githubComment.author);
+
+    const commentPayload = {
+      bodyText,
+      author,
+      model: model.name,
+      modelId: model.id
+    };
+    
+    let comment = yield controllers.comment.save(commentPayload);
+    return comment;
+  }),
+  saveComments: Promise.coroutine(function* (model, githubComments) {
+    let commentsPromises = githubComments.map( githubComment =>
+      this.saveComment(model, githubComment)
+    );
+
+    let comments = yield Promise.all(commentsPromises);
+    return comments;
   }),
   /**
     @param {Object} githubUser - User received from Github API
