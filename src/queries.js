@@ -4,14 +4,14 @@ export default {
       organization(login: $organization) {
         name
         login
-        repositories(first: 10, orderBy: {field: PUSHED_AT, direction: DESC}, privacy: PUBLIC) {
+        repositories(first: 30, orderBy: {field: PUSHED_AT, direction: DESC}, privacy: PUBLIC) {
           nodes {
             name
             url
             primaryLanguage {
               name
             }
-            pullRequests(first: 10) {
+            pullRequests(first: 20) {
               totalCount
               nodes {
                 title
@@ -30,15 +30,23 @@ export default {
                   url
                   avatarUrl
                 }
-                comments {
+                comments(last: 1) {
                   totalCount
+                  nodes {
+                    bodyText
+                    author {
+                      login
+                      avatarUrl
+                      url
+                    }
+                  }
                 }
                 commits {
                   totalCount
                 }
               }
             }
-            issues(first: 10) {
+            issues(first: 20 orderBy: {field: CREATED_AT, direction: DESC}) {
               totalCount,
               nodes {
                 title
@@ -56,6 +64,17 @@ export default {
                     login
                     avatarUrl
                     url
+                  }
+                }
+                comments(last: 1) {
+                  totalCount
+                  nodes {
+                    bodyText
+                    author {
+                      login
+                      avatarUrl
+                      url
+                    }
                   }
                 }
               }
