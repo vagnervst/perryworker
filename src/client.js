@@ -14,13 +14,12 @@ console.log(chalk.green('PerryWorker started running...'));
 Worker([
   {
     promise: requests.repositories.find({ organization: 'pagarme' }),
-    registrator: (response) => {
+    callback: (response) => {
+      console.log(response);
 
       let organization = response.data.organization;
 
-      return Generators.saveOrganization(organization);
+      Generators.saveOrganization(organization);
     }
   }
-]).run().then( (values) => {
-  Mongo.connection.close();
-});
+]).run();

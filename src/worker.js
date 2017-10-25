@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import Promise from 'bluebird';
+import { CronJob } from 'cron';
 
 /**
   @param {Object[]} requests
@@ -17,28 +19,41 @@ function Worker(requests) {
     return promises;
   }
 
+  function deliverPromisesResponsesToCallbacks( responses ) {
+
+    for( let i = 0; i < responses.length; i += 1 ) {
+      let callback = requests[i].callback;
+      callback( responses[i] );
+    }
+
+  }
+
+  function runPromises() {
+    return Promise.all(getPromises())
+    .then( responses => {
+
+      deliverPromisesResponsesToCallbacks( responses );
+
+    })
+    .catch( error => {
+      console.log( error );
+    });
+  }
+
   return {
+    schedule: function() {
+
+      new CronJob('0 0 */1 * * *', () => {
+        console.log('CronJob running...');
+        return runPromises();
+      }, () => console.log('stoped'), true, 'America/Sao_Paulo');
+
+    },
     run: function() {
       console.log(chalk.yellow('Worker started executing...'));
 
-      return Promise.all(getPromises())
-      .then( responses => {
-
-        let registratorPromises = [];
-        for( let i = 0; i < responses.length; ++i ) {
-          let registratorPromise = requests[i].registrator( responses[i] );
-          registratorPromises.push( registratorPromise );
-        }
-
-        return Promise
-        .all(registratorPromises)
-        .then( () => console.log(chalk.yellow('Worker finished execution')));
-
-      })
-      .catch( error => {
-        console.log( error );
-      });
-
+      runPromises();
+      this.schedule();
     }
   }
 }
