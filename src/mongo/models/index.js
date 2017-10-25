@@ -1,13 +1,15 @@
-import Issue from './issue.js';
-import Organization from './organization.js';
-import PullRequest from './pullrequest.js';
-import Repository from './repository.js';
-import User from './user.js';
+import Issue from './issue';
+import Organization from './organization';
+import PullRequest from './pullrequest';
+import Repository from './repository';
+import User from './user';
+import Comment from './comment';
 
 export default {
   Issue,
   Organization,
   PullRequest,
   Repository,
-  User
+  User,
+  Comment
 }
