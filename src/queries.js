@@ -4,49 +4,31 @@ export default {
       organization(login: $organization) {
         name
         login
-        repositories(first: 30, orderBy: {field: PUSHED_AT, direction: DESC}, privacy: PUBLIC) {
+        repositories(first: 50, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
           nodes {
             name
             url
             primaryLanguage {
               name
             }
-            pullRequests(first: 20) {
-              totalCount
-              nodes {
-                title
-                createdAt
-                url
-                bodyText
-                repository {
-                  name
-                  url
-                  primaryLanguage {
-                    name
-                  }
-                }
-                author {
-                  login
-                  url
-                  avatarUrl
-                }
-                comments(last: 1) {
-                  totalCount
-                  nodes {
-                    bodyText
-                    author {
-                      login
-                      avatarUrl
-                      url
-                    }
-                  }
-                }
-                commits {
-                  totalCount
-                }
-              }
+          }
+        }
+      }
+    }`
+  },
+  issues: {
+    company: `query findAllReposQuery($organization: String!) {
+      organization(login: $organization) {
+        name
+        login
+        repositories(first: 30, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
+          nodes {
+            name
+            url
+            primaryLanguage {
+              name
             }
-            issues(first: 20 orderBy: {field: CREATED_AT, direction: DESC}) {
+            issues(first: 40 orderBy: {field: UPDATED_AT, direction: DESC}) {
               totalCount,
               nodes {
                 title
@@ -82,9 +64,7 @@ export default {
           }
         }
       }
-    }`
-  },
-  issues: {
+    }`,
     related: `query pagarmeqlRelatedIssuesQuery($term: String!){
       search(query: $term, type: ISSUE, first: 50) {
         nodes {
@@ -122,6 +102,58 @@ export default {
               isPrivate
               owner {
                 login
+              }
+            }
+          }
+        }
+      }
+    }`
+  },
+  pullrequests: {
+    organization: `query findAllReposQuery($organization: String!) {
+      organization(login: $organization) {
+        name
+        login
+        repositories(first: 30, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
+          nodes {
+            name
+            url
+            primaryLanguage {
+              name
+            }
+            pullRequests(first: 20 orderBy: {field: UPDATED_AT, direction: DESC}) {
+              totalCount
+              nodes {
+                title
+                createdAt
+                url
+                bodyText
+                repository {
+                  name
+                  url
+                  primaryLanguage {
+                    name
+                  }
+                }
+                author {
+                  login
+                  url
+                  avatarUrl
+                }
+                comments(last: 1) {
+                  totalCount
+                  nodes {
+                    bodyText
+                    author {
+                      login
+                      avatarUrl
+                      url
+                    }
+                  }
+                }
+                commits {
+                  totalCount
+                }
               }
             }
           }

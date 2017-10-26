@@ -5,7 +5,7 @@ import queries from '../queries.js';
 function Issues() {
 
   return {
-    findFromOrganization: organizationLogin => {
+    fromOrganization: organizationLogin => {
 
       const options = {
         method: 'POST',
@@ -15,7 +15,7 @@ function Issues() {
           'Authorization': `bearer ${config.get('github.token')}`
         },
         body: {
-          query: queries.issues.company,
+          query: queries.pullrequests.organization,
           variables: { "organization": organizationLogin }
         },
         json: true
