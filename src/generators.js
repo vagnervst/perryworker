@@ -1,7 +1,10 @@
 import Promise from 'bluebird';
 import controllers from './mongo/controllers';
 import helpers from './mongo/helper';
-import { Schema } from 'mongoose'
+import { Schema } from 'mongoose';
+
+import blacklist from './blacklist.json';
+import filter from './filter.js';
 
 const Generators = {
   /**
@@ -23,6 +26,10 @@ const Generators = {
   saveRepository: Promise.coroutine(function* (organization, githubRepository) {
     const { name, url, issues, pullRequests } = githubRepository;
 
+    if( filter(blacklist.repositories).has(name) ) {
+      return;
+    }
+
     const primaryLanguage = githubRepository.primaryLanguage ?
       githubRepository.primaryLanguage.name : '';
 
@@ -35,8 +42,13 @@ const Generators = {
 
     let repository = yield controllers.repository.save(payload);
 
-    yield this.saveIssues(repository, issues.nodes);
-    yield this.savePullRequests(repository, pullRequests.nodes);
+    if( issues ) {
+      yield this.saveIssues(repository, issues.nodes);
+    }
+
+    if( pullRequests ) {
+      yield this.savePullRequests(repository, pullRequests.nodes);
+    }
 
     return repository;
   }),
@@ -145,7 +157,7 @@ const Generators = {
       model: model.name,
       modelId: model.id
     };
-    
+
     let comment = yield controllers.comment.save(commentPayload);
     return comment;
   }),
