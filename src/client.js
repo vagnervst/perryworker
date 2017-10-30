@@ -14,7 +14,7 @@ console.log(chalk.green('PerryWorker started running...'));
 Worker([
   {
     promise: requests.repositories.find({ organization: 'pagarme' }),
-    callback: (response) => {      
+    callback: (response) => {
 
       let organization = response.data.organization;
 

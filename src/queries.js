@@ -2,10 +2,12 @@ export default {
   repositories: {
     findAll: `query findAllReposQuery($organization: String!) {
       organization(login: $organization) {
+        id
         name
         login
         repositories(first: 50, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
           nodes {
+            id
             name
             url
             primaryLanguage {
@@ -19,18 +21,21 @@ export default {
   issues: {
     company: `query findAllReposQuery($organization: String!) {
       organization(login: $organization) {
+        id
         name
         login
         repositories(first: 30, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
           nodes {
+            id
             name
             url
             primaryLanguage {
               name
             }
-            issues(first: 40 orderBy: {field: UPDATED_AT, direction: DESC}) {
+            issues(first: 40 orderBy: {field: UPDATED_AT, direction: DESC} states:[OPEN]) {
               totalCount,
               nodes {
+                id
                 title
                 state
                 author {
@@ -43,6 +48,7 @@ export default {
                 bodyText
                 assignees(first: 3) {
                   nodes {
+                    id
                     login
                     avatarUrl
                     url
@@ -51,6 +57,7 @@ export default {
                 comments(last: 1) {
                   totalCount
                   nodes {
+                    id
                     bodyText
                     author {
                       login
@@ -70,6 +77,7 @@ export default {
         nodes {
           ... on Issue {
             __typename
+            id
             title
             state
             createdAt
@@ -81,6 +89,7 @@ export default {
             }
             assignees(first: 3) {
               nodes {
+                id
                 avatarUrl
                 login
                 url
@@ -89,6 +98,7 @@ export default {
             comments(last: 1) {
               totalCount
               nodes {
+                id
                 bodyText
                 author {
                   login
@@ -97,6 +107,7 @@ export default {
               }
             }
             repository {
+              id
               name
               url
               isPrivate
@@ -112,23 +123,27 @@ export default {
   pullrequests: {
     organization: `query findAllReposQuery($organization: String!) {
       organization(login: $organization) {
+        id
         name
         login
         repositories(first: 30, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
           nodes {
+            id
             name
             url
             primaryLanguage {
               name
             }
-            pullRequests(first: 20 orderBy: {field: UPDATED_AT, direction: DESC}) {
+            pullRequests(first: 20 orderBy: {field: UPDATED_AT, direction: DESC} states:[OPEN]) {
               totalCount
               nodes {
+                id
                 title
                 createdAt
                 url
                 bodyText
                 repository {
+                  id
                   name
                   url
                   primaryLanguage {
@@ -143,6 +158,7 @@ export default {
                 comments(last: 1) {
                   totalCount
                   nodes {
+                    id
                     bodyText
                     author {
                       login

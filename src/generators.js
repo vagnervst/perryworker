@@ -11,9 +11,9 @@ const Generators = {
     @param {Object} githubOrganization - Organization received from Github API
   */
   saveOrganization: Promise.coroutine(function* (githubOrganization) {
-    const { name, login, repositories } = githubOrganization;
+    const { id, name, login, repositories } = githubOrganization;
 
-    let organization = yield controllers.organization.save({ name, login });
+    let organization = yield controllers.organization.save({ id, name, login });
 
     yield this.saveRepositories(organization, repositories.nodes);
 
@@ -24,7 +24,7 @@ const Generators = {
     @param {Object} githubRepository - Repository received from Github API
   */
   saveRepository: Promise.coroutine(function* (organization, githubRepository) {
-    const { name, url, issues, pullRequests } = githubRepository;
+    const { id, name, url, issues, pullRequests } = githubRepository;
 
     if( filter(blacklist.repositories).has(name) ) {
       return;
@@ -34,6 +34,7 @@ const Generators = {
       githubRepository.primaryLanguage.name : '';
 
     const payload = {
+      id,
       name,
       organizationId: organization._id,
       primaryLanguage,
@@ -69,12 +70,13 @@ const Generators = {
     @param {Object} githubIssue - Issue received from Github API
   */
   saveIssue: Promise.coroutine(function* (repository, githubIssue) {
-    const { title, state, url, createdAt, comments } = githubIssue;
+    const { id, title, state, url, createdAt, comments } = githubIssue;
 
     let author = yield this.saveUser(githubIssue.author);
     let assignees = yield this.saveUsers(githubIssue.assignees.nodes);
 
     const issuePayload = {
+      id,
       title,
       state,
       url,
@@ -113,11 +115,12 @@ const Generators = {
     @param {Object} githubPullRequest - PullRequest received from Github API
   */
   savePullRequest: Promise.coroutine(function* (repository, githubPullRequest) {
-    const { title, createdAt, url, bodyText, comments, commits } = githubPullRequest;
+    const { id, title, createdAt, url, bodyText, comments, commits } = githubPullRequest;
 
     let author = yield this.saveUser(githubPullRequest.author);
 
     const pullRequestPayload = {
+      id,
       title,
       createdAt,
       url,
@@ -148,10 +151,11 @@ const Generators = {
     return pullRequests;
   }),
   saveComment: Promise.coroutine(function* (model, githubComment) {
-    const { bodyText } = githubComment;
+    const { id, bodyText } = githubComment;
     let author = yield this.saveUser(githubComment.author);
 
     const commentPayload = {
+      id,
       bodyText,
       author,
       model: model.name,

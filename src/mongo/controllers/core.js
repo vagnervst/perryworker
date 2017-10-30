@@ -15,6 +15,12 @@ function ControllerCore(Model) {
       .catch( err => {
 
         if( isDuplicateKeyError(err) ) {
+          if( spec.id ) {
+            spec = {
+              id: spec.id
+            };
+          }
+          
           return Model.findOne(spec)
           .then( foundDocument => {
             if( foundDocument ) {
