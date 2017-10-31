@@ -19,7 +19,7 @@ export default {
     }`
   },
   issues: {
-    company: `query findAllReposQuery($organization: String!) {
+    company: `query findAllReposQuery($organization: String!, $status: [IssueState!]) {
       organization(login: $organization) {
         id
         name
@@ -32,7 +32,7 @@ export default {
             primaryLanguage {
               name
             }
-            issues(first: 40 orderBy: {field: UPDATED_AT, direction: DESC} states:[OPEN]) {
+            issues(first: 40 orderBy: {field: UPDATED_AT, direction: DESC} states:$status) {
               totalCount,
               nodes {
                 id

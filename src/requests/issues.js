@@ -5,7 +5,7 @@ import queries from '../queries.js';
 function Issues() {
 
   return {
-    findFromOrganization: organizationLogin => {
+    findFromOrganization: (organizationLogin, states) => {
 
       const options = {
         method: 'POST',
@@ -16,7 +16,7 @@ function Issues() {
         },
         body: {
           query: queries.issues.company,
-          variables: { "organization": organizationLogin }
+          variables: { "organization": organizationLogin, "status": states }
         },
         json: true
       }

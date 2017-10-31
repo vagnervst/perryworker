@@ -15,16 +15,22 @@ Worker([
   {
     promise: requests.repositories.find({ organization: 'pagarme' }),
     callback: (response) => {
-
       let organization = response.data.organization;
 
       Generators.saveOrganization(organization);
     }
   },
   {
-    promise: requests.issues.findFromOrganization('pagarme'),
+    promise: requests.issues.findFromOrganization('pagarme', ['OPEN']),
     callback: (response) => {
+      let organization = response.data.organization;
 
+      Generators.saveOrganization(organization);
+    }
+  },
+  {
+    promise: requests.issues.findFromOrganization('pagarme', ['CLOSED']),
+    callback: (response) => {
       let organization = response.data.organization;
 
       Generators.saveOrganization(organization);
@@ -33,10 +39,27 @@ Worker([
   {
     promise: requests.pullrequests.fromOrganization('pagarme'),
     callback: (response) => {
-
       let organization = response.data.organization;
 
       Generators.saveOrganization(organization);
+    }
+  },
+  {
+    promise: requests.issues.findRelated('pagarme'),
+    callback: (response) => {
+      let foundIssues = response.data.search.nodes;
+
+      let filteredIssues = Sieve({
+        whiteList: ['Issue'],
+        itemsToFilter: foundIssues
+      }, issue => issue.__typename ).mitigate();
+
+      filteredIssues = Sieve({
+        blackList: ['pagarme'],
+        itemsToFilter: filteredIssues
+      }, issue => issue.repository.name ).mitigate();
+
+      console.log('%j', filteredIssues);      
     }
   }
 ]).run();
