@@ -58,10 +58,7 @@ Worker([
       filteredIssues = Sieve({
         blacklist: ['pagarme'],
         itemsToFilter: filteredIssues
-      }, issue => issue.repository.name ).mitigate();
-
-      console.log('%j', filteredIssues);
-
+      }, issue => issue.repository.owner.login ).mitigate();      
     }
   }
 ]).run();
