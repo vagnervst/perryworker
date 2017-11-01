@@ -1,25 +1,19 @@
 /**
   @param {Object} filterOptions
-  @param {Array} filterOptions.blackList
-  @param {Array} filterOptions.whiteList
+  @param {Array} filterOptions.blacklist
+  @param {Array} filterOptions.whitelist
   @param {Array} filterOptions.itemsToFilter
   @param {Function} getValueToCompare
 */
 function Sieve(filterOptions, getValueToCompare) {
 
-  function filterUsingWhiteList() {
-    return filterInclusive( filterOptions.whiteList );
-  }
-
-  function filterUsingBlackList() {
-    return filterExclusive( filterOptions.blackList );
-  }
-
   function filterInclusive( comparableList ) {
     let filteredItems = [];
 
     filterOptions.itemsToFilter.forEach( item => {
-      if( has(comparableList, getValueToCompare(item)) ) {
+      const comparableValue = ( getValueToCompare )? getValueToCompare(item) : item;
+
+      if( has(comparableList, comparableValue) ) {
         filteredItems.push(item);
       }
     });
@@ -31,7 +25,9 @@ function Sieve(filterOptions, getValueToCompare) {
     let filteredItems = [];
 
     filterOptions.itemsToFilter.forEach( item => {
-      if( !has(comparableList, getValueToCompare(item)) ) {
+      const comparableValue = ( getValueToCompare )? getValueToCompare(item) : item;
+
+      if( !has(comparableList, comparableValue) ) {
         filteredItems.push(item);
       }
     });
@@ -50,17 +46,17 @@ function Sieve(filterOptions, getValueToCompare) {
 
   return {
     mitigate: function() {
-      if( filterOptions.blackList && filterOptions.whiteList ) {
+      if( filterOptions.blacklist && filterOptions.whitelist ) {
         throw {
           type: 'FilterException',
           message: "Can't filter for both blacklist and whitelist"
         };
       }
 
-      if( filterOptions.blackList ) {
-        return filterUsingBlackList();
-      } else if( filterOptions.whiteList ) {
-        return filterUsingWhiteList();
+      if( filterOptions.blacklist ) {
+        return filterExclusive( filterOptions.blacklist );
+      } else if( filterOptions.whitelist ) {
+        return filterInclusive( filterOptions.whitelist );
       }
     }
   }

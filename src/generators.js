@@ -4,7 +4,7 @@ import helpers from './mongo/helper';
 import { Schema } from 'mongoose';
 
 import blacklist from './blacklist.json';
-import filter from './filter.js';
+import Sieve from './sieve';
 
 const Generators = {
   /**
@@ -26,7 +26,12 @@ const Generators = {
   saveRepository: Promise.coroutine(function* (organization, githubRepository) {
     const { id, name, url, issues, pullRequests } = githubRepository;
 
-    if( filter(blacklist.repositories).has(name) ) {
+    let has = Sieve({
+                blacklist: blacklist.repositories,
+                itemsToFilter: [ name ]
+              }).mitigate();
+
+    if( has.length === 0 ) {
       return;
     }
 

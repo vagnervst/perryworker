@@ -8,6 +8,7 @@ import Mongo from './mongo/connection';
 import Helpers from './mongo/helper';
 import Generators from './generators';
 import asciiPerry from '../ascii';
+import Sieve from './sieve';
 
 console.log(asciiPerry);
 console.log(chalk.green('PerryWorker started running...'));
@@ -50,16 +51,17 @@ Worker([
       let foundIssues = response.data.search.nodes;
 
       let filteredIssues = Sieve({
-        whiteList: ['Issue'],
+        whitelist: ['Issue'],
         itemsToFilter: foundIssues
       }, issue => issue.__typename ).mitigate();
 
       filteredIssues = Sieve({
-        blackList: ['pagarme'],
+        blacklist: ['pagarme'],
         itemsToFilter: filteredIssues
       }, issue => issue.repository.name ).mitigate();
 
-      console.log('%j', filteredIssues);      
+      console.log('%j', filteredIssues);
+
     }
   }
 ]).run();
