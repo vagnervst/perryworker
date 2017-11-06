@@ -15,26 +15,26 @@ console.log(chalk.green('PerryWorker started running...'));
 Worker([
   {
     promise: requests.repositories.find({ organization: 'pagarme' }),
-    callback: (response) => {
-      let organization = response.data.organization;
+    callback: Promise.coroutine(function* (response) {
+      const apiOrganization = response.data.organization;
 
-      Generators.saveOrganization(organization);
-    }
+      yield Generators.organization.saveOrganization(apiOrganization, apiOrganization.repositories.nodes);
+    })
   },
   {
     promise: requests.issues.findFromOrganization('pagarme', ['OPEN']),
     callback: (response) => {
       let organization = response.data.organization;
 
-      Generators.saveOrganization(organization);
-    }
+      Generators.organization.saveOrganization(organization, organization.repositories.nodes);
+    },
   },
   {
     promise: requests.issues.findFromOrganization('pagarme', ['CLOSED']),
     callback: (response) => {
       let organization = response.data.organization;
 
-      Generators.saveOrganization(organization);
+      Generators.organization.saveOrganization(organization, organization.repositories.nodes);
     }
   },
   {
@@ -42,23 +42,39 @@ Worker([
     callback: (response) => {
       let organization = response.data.organization;
 
-      Generators.saveOrganization(organization);
+      Generators.organization.saveOrganization(organization, organization.repositories.nodes);
     }
   },
   {
     promise: requests.issues.findRelated('pagarme'),
-    callback: (response) => {
-      let foundIssues = response.data.search.nodes;
+    callback: (issues) => {
 
-      let filteredIssues = Sieve({
-        whitelist: ['Issue'],
-        itemsToFilter: foundIssues
-      }, issue => issue.__typename ).mitigate();
+      issues.map(Promise.coroutine(function* (githubIssue) {
+        const githubRepositoryOwner = githubIssue.repository.owner;
 
-      filteredIssues = Sieve({
-        blacklist: ['pagarme'],
-        itemsToFilter: filteredIssues
-      }, issue => issue.repository.owner.login ).mitigate();      
+        let mongoRepositoryOwner = null;
+        if( githubRepositoryOwner.__typename === 'Organization' ) {
+          mongoRepositoryOwner = yield Generators.organization.saveOrganization(
+            githubRepositoryOwner
+          );
+        } else if( githubRepositoryOwner.__typename === 'User' ) {
+          mongoRepositoryOwner = yield Generators.user.saveUser(
+            githubRepositoryOwner
+          );
+        }
+
+        mongoRepositoryOwner = {
+          model: githubRepositoryOwner.__typename,
+          id: mongoRepositoryOwner._id
+        };
+
+        let repository = yield Generators.repository.saveRepository(
+          mongoRepositoryOwner, githubIssue.repository
+        );
+
+        yield Generators.issue.saveIssue( repository, githubIssue );
+      }));
+
     }
   }
 ]).run();
