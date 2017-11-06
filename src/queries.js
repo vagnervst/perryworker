@@ -102,6 +102,7 @@ export default {
                 bodyText
                 author {
                   login
+                  avatarUrl
                   url
                 }
               }
@@ -112,7 +113,19 @@ export default {
               url
               isPrivate
               owner {
-                login
+                __typename
+                ... on User {
+                  id
+                  avatarUrl
+                  name
+                  login
+                  url
+                }
+                ... on Organization {
+                  id
+                  login
+                  name
+                }
               }
             }
           }
