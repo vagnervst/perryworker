@@ -1,6 +1,7 @@
 import promise from 'request-promise';
 import config from '../config.js';
 import queries from '../queries.js';
+import Sieve from '../sieve';
 
 function Issues() {
 
@@ -40,7 +41,22 @@ function Issues() {
         json: true
       }
 
-      return promise(options);
+      return promise(options)
+      .then( foundIssues => {
+        foundIssues = foundIssues.data.search.nodes;
+
+        let filteredIssues = Sieve({
+          whitelist: ['Issue'],
+          itemsToFilter: foundIssues
+        }, issue => issue.__typename ).mitigate();
+
+        filteredIssues = Sieve({
+          blacklist: ['pagarme'],
+          itemsToFilter: filteredIssues
+        }, issue => issue.repository.owner.login ).mitigate();
+
+        return filteredIssues;
+      });
     }
   }
 }
