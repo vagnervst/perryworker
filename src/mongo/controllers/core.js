@@ -15,18 +15,18 @@ function ControllerCore(Model) {
       .catch( err => {
 
         if( isDuplicateKeyError(err) ) {
-          if( spec.id ) {
+          if( spec.githubId ) {
             spec = {
-              id: spec.id
+              githubId: spec.githubId
             };
           }
-          
+
           return Model.findOne(spec)
           .then( foundDocument => {
             if( foundDocument ) {
               return foundDocument;
             }
-          });
+          }).catch( err => console.log(err));
         }
 
         console.log(chalk.red('Mongo Operation: ') + err)

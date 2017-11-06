@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const PullRequestSchema = new Schema({
-  id: { type: String, required: true, unique: true },
+  githubId: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   repositoryId: { type: Schema.Types.ObjectId, required: true },
   createdAt: { type: String, required: true },

@@ -2,9 +2,10 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const RepositorySchema = new Schema({
-  id: { type: String, required: true, unique: true },
-  name: { type: String, required: true, unique: true, index: true },
-  organizationId: { type: Schema.Types.ObjectId, required: true },
+  githubId: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  ownerModel: { type: String, required: true },
+  ownerId: { type: Schema.Types.ObjectId, required: true },
   primaryLanguage: { type: String },
   url: { type: String, required: true }
 });

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const IssueSchema = new Schema({
-  id: { type: String, required: true, unique: true },
+  githubId: { type: String, required: true, unique: true },
   title: { type: String, required: true },
   state: { type: String, required: true },
   url: { type: String, required: true },

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 const CommentSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
+  githubId: { type: String, required: true, unique: true },
   bodyText: { type: String },
   author: { type: Schema.Types.ObjectId, ref: 'User' },
   model: { type: String },
