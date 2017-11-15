@@ -27,7 +27,7 @@ const PullRequestGenerators = {
 
     let pullRequest = yield controllers.pullrequest.save(pullRequestPayload);
 
-    let commentsDocuments = yield CommentGenerators.saveComments({ name: 'pullrequest', id: pullRequest._id }, comments.nodes );
+    let commentsDocuments = yield CommentGenerators.saveComments({ model: 'pullrequest', id: pullRequest._id }, comments.nodes );
 
     return pullRequest;
   }),

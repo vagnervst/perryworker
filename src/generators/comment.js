@@ -4,9 +4,12 @@ import UserGenerators from './user';
 
 const CommentGenerators = {
   /**
-    TODO add javadoc
+    @param {Object} spec - model details
+    @param {String} spec.model - model which the comment belongs to. issue or pullrequest
+    @param {ObjectId} spec.id - object relation
+    @param {Object} githubComment - github comment payload
   */
-  saveComment: Promise.coroutine(function* (model, githubComment) {
+  saveComment: Promise.coroutine(function* (spec, githubComment) {
     const { id, bodyText } = githubComment;
     let author = yield UserGenerators.saveUser(githubComment.author);
 
@@ -14,8 +17,8 @@ const CommentGenerators = {
       githubId: id,
       bodyText,
       author,
-      model: model.name,
-      modelId: model.id
+      model: spec.model,
+      modelId: spec.id
     };
 
     let comment = yield controllers.comment.save(commentPayload);
