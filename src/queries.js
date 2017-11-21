@@ -54,7 +54,7 @@ export default {
                     url
                   }
                 }
-                comments(last: 1) {
+                comments(first: 50) {
                   totalCount
                   nodes {
                     id
