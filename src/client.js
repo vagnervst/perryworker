@@ -18,38 +18,38 @@ Worker([
     callback: Promise.coroutine(function* (response) {
       const apiOrganization = response.data.organization;
 
-      yield Generators.organization.saveOrganization(apiOrganization, apiOrganization.repositories.nodes);
+      return yield Generators.organization.saveOrganization(apiOrganization, apiOrganization.repositories.nodes);
     })
   },
   {
     promise: requests.issues.findFromOrganization('pagarme', ['OPEN']),
-    callback: (response) => {
+    callback: Promise.coroutine(function* (response) {
       let organization = response.data.organization;
 
-      Generators.organization.saveOrganization(organization, organization.repositories.nodes);
-    },
+      return yield Generators.organization.saveOrganization(organization, organization.repositories.nodes);
+    })
   },
   {
     promise: requests.issues.findFromOrganization('pagarme', ['CLOSED']),
-    callback: (response) => {
+    callback: Promise.coroutine(function* (response) {
       let organization = response.data.organization;
 
-      Generators.organization.saveOrganization(organization, organization.repositories.nodes);
-    }
+      return yield Generators.organization.saveOrganization(organization, organization.repositories.nodes);
+    })
   },
   {
     promise: requests.pullrequests.fromOrganization('pagarme'),
-    callback: (response) => {
+    callback: Promise.coroutine(function* (response) {
       let organization = response.data.organization;
 
-      Generators.organization.saveOrganization(organization, organization.repositories.nodes);
-    }
+      return yield Generators.organization.saveOrganization(organization, organization.repositories.nodes);
+    })
   },
   {
     promise: requests.issues.findRelated('pagarme'),
-    callback: (issues) => {
+    callback: (issues, callback) => {
 
-      issues.map(Promise.coroutine(function* (githubIssue) {
+      return issues.map(Promise.coroutine(function* (githubIssue) {
         const githubRepositoryOwner = githubIssue.repository.owner;
 
         let mongoRepositoryOwner = null;
@@ -72,9 +72,12 @@ Worker([
           mongoRepositoryOwner, githubIssue.repository
         );
 
-        yield Generators.issue.saveIssue( repository, githubIssue );
+        return yield Generators.issue.saveIssue( repository, githubIssue );
       }));
 
     }
   }
-]).run();
+]).run(() => {
+  console.log(chalk.yellow('Perryworker stopped running.'));
+  process.exit();
+});
