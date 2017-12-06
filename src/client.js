@@ -79,5 +79,5 @@ Worker([
   }
 ]).run(() => {
   console.log(chalk.yellow('Perryworker stopped running.'));
-  process.exit();
+  Mongo.connection.close();
 });
