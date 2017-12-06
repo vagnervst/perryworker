@@ -10,7 +10,6 @@ const IssueGenerators = {
   */
   saveIssue: Promise.coroutine(function* (repository, githubIssue) {
     const { id, title, state, url, createdAt, comments } = githubIssue;
-    console.log('%j', comments.nodes);
 
     let author = yield UserGenerators.saveUser(githubIssue.author);
     let assignees = yield UserGenerators.saveUsers(githubIssue.assignees.nodes);

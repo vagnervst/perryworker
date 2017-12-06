@@ -1,4 +1,5 @@
 import convict from 'convict';
+require('dotenv').load();
 
 const config = convict({
   github: {

@@ -16,6 +16,21 @@ export default {
           }
         }
       }
+    }`,
+    findOne: `query findOneRepoQuery($organization: String!, $repository: String!) {
+      organization(login: $organization) {
+        id
+        name
+        login
+        repository(name: $repository) {
+          id
+          name
+          url
+          primaryLanguage {
+            name
+          }
+        }
+      }
     }`
   },
   issues: {
