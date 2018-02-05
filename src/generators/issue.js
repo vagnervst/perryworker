@@ -9,8 +9,7 @@ const IssueGenerators = {
     @param {Object} githubIssue - Issue received from Github API
   */
   saveIssue: Promise.coroutine(function* (repository, githubIssue) {
-    const { id, title, state, url, createdAt, comments } = githubIssue;
-    console.log('%j', comments.nodes);
+    const { id, title, bodyText, state, url, createdAt, comments } = githubIssue;
 
     let author = yield UserGenerators.saveUser(githubIssue.author);
     let assignees = yield UserGenerators.saveUsers(githubIssue.assignees.nodes);
@@ -18,6 +17,7 @@ const IssueGenerators = {
     const issuePayload = {
       githubId: id,
       title,
+      bodyText,
       state,
       url,
       createdAt,
@@ -31,6 +31,7 @@ const IssueGenerators = {
       commentsCount: comments.totalCount
     };
 
+    console.log('%j', issuePayload);
     let issue = yield controllers.issue.save(issuePayload);
 
     let commentsDocuments = yield CommentGenerators.saveComments({ name: 'issue', id: issue._id }, comments.nodes);
