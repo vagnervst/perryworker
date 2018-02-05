@@ -4,7 +4,9 @@ import Promise from 'bluebird';
 
 import config from '../config.js';
 
-mongoose.connect( `mongodb://${config.get('mongo.user')}:${config.get('mongo.password')}@${config.get('mongo.host')}`, { useMongoClient: true } );
+console.log( `mongodb://${config.get('mongo.user')}:${config.get('mongo.password')}@${config.get('mongo.host')}` );
+
+mongoose.connect( `mongodb://${config.get('mongo.host')}`, { useMongoClient: true } );
 mongoose.Promise = Promise;
 
 mongoose.connection.on('error', error => {

@@ -23,6 +23,28 @@ function Repositories() {
     return promise(options);
   }
 
+  function findOne(opts) {
+
+    const options = {
+      method: 'POST',
+      uri: config.get('github.url'),
+      headers: {
+        'User-Agent': 'perryworker',
+        'Authorization': `bearer ${config.get('github.token')}`
+      },
+      body: {
+        query: queries.repositories.findOne,
+        variables: {
+          "organization": opts.organization,
+          "repository": opts.name
+        }
+      },
+      json: true
+    }
+
+    return promise(options);
+  }
+
   return {
     /**
       @param {object} opts

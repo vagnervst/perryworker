@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --require babel-core/register"
   },
   "author": "Vagner S",
   "license": "ISC",
@@ -14,13 +14,17 @@
     "bluebird": "^3.5.1",
     "chalk": "^2.1.0",
     "convict": "^4.0.1",
-    "cron": "^1.3.0",
     "dotenv": "^4.0.0",
     "mongoose": "^4.12.1",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1"
+    "babel-preset-env": "^1.6.1"
+  },
+  "devDependencies": {
+    "co-mocha": "^1.2.1",
+    "mocha": "^4.0.1"
   }
 }
