@@ -13,23 +13,11 @@ const config = convict({
     }
   },
   mongo: {
-    host: {
+    url: {
       doc: 'Host for mongo connection',
       format: '*',
-      env: 'MONGO_HOST',
+      env: 'MONGO_URL',
       default: 'Mongo Database'
-    },
-    user: {
-      doc: 'Username for mongo connection',
-      format: String,
-      default: 'Username',
-      env: 'MONGO_USER'
-    },
-    password: {
-      doc: 'Password for mongo connection',
-      format: String,
-      default: 'Password',
-      env: 'MONGO_PASSWORD'
     }
   }
 });

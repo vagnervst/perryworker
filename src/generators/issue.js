@@ -31,7 +31,6 @@ const IssueGenerators = {
       commentsCount: comments.totalCount
     };
 
-    console.log('%j', issuePayload);
     let issue = yield controllers.issue.save(issuePayload);
 
     let commentsDocuments = yield CommentGenerators.saveComments({ name: 'issue', id: issue._id }, comments.nodes);

@@ -4,13 +4,12 @@ import Promise from 'bluebird';
 
 import config from '../config.js';
 
-console.log( `mongodb://${config.get('mongo.user')}:${config.get('mongo.password')}@${config.get('mongo.host')}` );
-
-mongoose.connect( `mongodb://${config.get('mongo.host')}`, { useMongoClient: true } );
+mongoose.connect( `${config.get('mongo.url')}`, { useMongoClient: true } );
 mongoose.Promise = Promise;
 
 mongoose.connection.on('error', error => {
-  console.log( chalk.red('Mongo connection error') + ' ' + error );
+  console.log(`${chalk.red('Mongo connection error:')} ${error}`);
+  process.exit(1);
 });
 
 mongoose.connection.once('open', () => {
